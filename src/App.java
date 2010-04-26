@@ -40,7 +40,7 @@ public class App {
             else
                 BuildMochaUI.Rebuild(path,force);
         } catch(Exception e) {
-            
+             e.printStackTrace();
         }
     }
 

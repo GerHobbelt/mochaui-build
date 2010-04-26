@@ -38,7 +38,7 @@ public class BuildMochaUI {
         int size = files.length;
         for (int i = 0; i < size; i++) {
             String jsname = files[i];
-            File file = new File(jsname);
+            File file = new File(from + File.separator + jsname);
             if (file.isFile() && jsname.indexOf("mootools-") >= 0) {
                 if (!jsname.equals(mootoolsCore) && !jsname.equals(mootoolsMore)) {
                     try {
@@ -146,7 +146,7 @@ public class BuildMochaUI {
             if(firstPos<lastPos) {
                 String part1=src.substring(0,firstPos);                  // before tag
                 String part2=src.substring(lastPos);                     // after tag
-                String partRep=src.substring(firstPos,lastPos-firstPos); // section we are replacing
+                String partRep=src.substring(firstPos,lastPos + tag.length()); // section we are replacing
 
                 int size=mootoolsScripts.length;
                 boolean hasMocha = false;
@@ -169,6 +169,14 @@ public class BuildMochaUI {
 
         writeFile(to,src);
         new File(to).setLastModified(new File(from).lastModified());
+    }
+
+    private void mkdir(String name) {
+        File dir = new File(name);
+        if (!dir.exists()) {
+            if (dir.mkdir())
+                System.out.printf("\n    [mkdir] %s", name);
+        }
     }
 
     private void compressJsFile(String from, String to) {
@@ -209,7 +217,7 @@ public class BuildMochaUI {
             Writer out = new OutputStreamWriter(new FileOutputStream(to), "UTF-8");
             compressor.compress(out, -1, false, false, false, false);            
 
-            System.err.printf("\n[compress] compressed %s to %s",from,to);
+            System.out.printf("\n [compress] compressed %s to %s",from,to);
         } catch(Exception e) {
             System.err.printf("\n    [ERROR] failed to compress %s", to);
         }
@@ -245,17 +253,14 @@ public class BuildMochaUI {
         File dir = new File(to);
 
         // make sure base destination path exists
-        if (!dir.exists()) {
-            if (dir.mkdir())
-                System.out.printf("\n    [mkdir] %s", to);
-        }
+        mkdir(to);
 
         // remove js files that no longer exist
         if (clear) {
             String[] files = dir.list();
             int size = files.length;
             for (int i = 0; i < size; i++) {
-                File file = new File(files[i]);
+                File file = new File(dir.toString() + s + files[i]);
                 if (!file.isDirectory()) {
                     String srcFile = from + s + files[i].replace(to, "");
                     File file2 = new File(srcFile);
@@ -280,18 +285,16 @@ public class BuildMochaUI {
         String[] files = dir.list();
         int size = files.length;
         for (int i = 0; i < size; i++) {
-            File file = new File(files[i]);
-            String fromFile = files[i];
-            String toFile = to + fromFile.replace(from + s, "''");
+            File file = new File(dir.toString() + s + files[i]);
+            String fromFile = from + s + files[i];
+            String toFile = to + fromFile.replace(from + s, "");
+            File file2 = new File(toFile);
 
             // if it is a file
             if (file.isFile()) {
-                File file2 = new File(toFile);
-
                 // make sure path exists
                 String toPath = toFile.replace(file2.getName(), "");
-                if (new File(toPath).mkdir())
-                    System.out.printf("\n    [mkdir] %s", toPath);
+                mkdir(toPath);
 
                 // if target does not exist or is older then copy/compress
                 if ((!file2.exists() || file2.lastModified() < file.lastModified()) && fromFile.indexOf('.') > 0 || forceCopy) {
@@ -314,10 +317,7 @@ public class BuildMochaUI {
                 }
             } else {
                 // if it is a directory make it
-                if (!file.exists()) {
-                    if (file.mkdir())
-                        System.out.printf("\n    [mkdir] %s", files[i]);
-                }
+                mkdir(toFile);
             }
         }
     }
@@ -339,7 +339,7 @@ public class BuildMochaUI {
         String[] files = mooTools.list();
         int size = files.length;
         for (int i = 0; i < size; i++) {
-            File file = new File(files[i]);
+            File file = new File(mooTools.toString() + s + files[i]);
             String jsname = file.getName();
             if (jsname.indexOf("mootools-") >= 0 && jsname.endsWith(".js")) {
                 if (jsname.indexOf("-core") > 0) {
@@ -360,6 +360,7 @@ public class BuildMochaUI {
 
         //------------------------------------------------------
         // now copy themes and plugins to demo
+        mkdir(mochaPath+"demo");
         copyResources(demoDir, new File(mochaPath+"demo").getCanonicalPath(), "js", true, false, new String[]{"plugins", "themes", "scripts"});
         copyResources(pluginsDir, new File(mochaPath+"demo/plugins").getCanonicalPath(), "js", true, false, null);
         copyResources(themesDir, new File(mochaPath+"demo/themes").getCanonicalPath(), "js", true, false, null);
@@ -368,6 +369,7 @@ public class BuildMochaUI {
 
         //------------------------------------------------------
         // now copy themes and plugins to the build folder
+        mkdir(mochaPath+"build");
         copyResources(pluginsDir, new File(mochaPath+"build/plugins").getCanonicalPath(), "js", true, true, null);
         copyResources(themesDir, new File(mochaPath+"build/themes").getCanonicalPath(), "css", true, true, null);
         removeOldMooTools(buildJS);
@@ -404,7 +406,7 @@ public class BuildMochaUI {
 
         if (!dest.exists() || dest.lastModified() < mootoolsScriptsMod) {
             // clear the demo mocha.js
-            System.out.printf("\n    [mkdir] %s", dest.getCanonicalPath());
+            System.out.printf("\n [building] %s", dest.getCanonicalPath());
             if (dest.exists()) dest.delete();
 
 
