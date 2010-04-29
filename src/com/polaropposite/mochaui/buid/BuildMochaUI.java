@@ -17,13 +17,8 @@ public class BuildMochaUI {
     private long mootoolsScriptsMod = 0;
     private String[] mootoolsScripts = {
             "Core/Core.js",
-            "Utilities/Themes.js",
             "Window/Window.js",
             "Window/Modal.js",
-            "Window/Windows-from-html.js",
-            "Window/Windows-from-json.js",
-            "Window/Arrange-cascade.js",
-            "Window/Arrange-tile.js",
             "Components/Tabs.js",
             "Layout/Layout.js",
             "Layout/Dock.js",
@@ -277,6 +272,8 @@ public class BuildMochaUI {
                                 System.out.printf("   [delete] Deleted %s\n", files[i]);
                         }
                     }
+                } else {
+                    copyResources(from + s + files[i], to + s + files[i], fileType, clear, compress, exclude);
                 }
             }
         }
@@ -330,7 +327,7 @@ public class BuildMochaUI {
         if(!mochaPath.endsWith("/") && !mochaPath.endsWith("\\")) mochaPath+=s;
         
         // resource directories
-        File mooTools = new File(mochaPath+"src/scripts");
+        File mooTools = new File(mochaPath+"src/core");
         String pluginsDir = new File(mochaPath+"src/plugins").getCanonicalPath();
         String themesDir = new File(mochaPath+"src/themes").getCanonicalPath();
         String demoDir = new File(mochaPath+"src/demo").getCanonicalPath();
@@ -361,7 +358,7 @@ public class BuildMochaUI {
         //------------------------------------------------------
         // now copy themes and plugins to demo
         mkdir(mochaPath+"demo");
-        copyResources(demoDir, new File(mochaPath+"demo").getCanonicalPath(), "js", true, false, new String[]{"plugins", "themes", "scripts"});
+        copyResources(demoDir, new File(mochaPath+"demo").getCanonicalPath(), "js", true, false, new String[]{"plugins", "themes"});
         copyResources(pluginsDir, new File(mochaPath+"demo/plugins").getCanonicalPath(), "js", true, false, null);
         copyResources(themesDir, new File(mochaPath+"demo/themes").getCanonicalPath(), "js", true, false, null);
         removeOldMooTools(demoJS);
@@ -393,7 +390,7 @@ public class BuildMochaUI {
         //----------------------------------------------------------
         // create the demo mocha.js that is not compressed
         File dest = new File(mochaPath+"demo/scripts/mocha.js");
-        String dir1 = new File(mochaPath+"src/scripts").getCanonicalPath() + s;
+        String dir1 = new File(mochaPath+"src/core").getCanonicalPath() + s;
 
         // first see if any of the files have changed, get the oldest script
         size = mootoolsScripts.length;
