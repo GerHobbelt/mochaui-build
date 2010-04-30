@@ -1,4 +1,4 @@
-package com.polaropposite.mochaui.buid;
+package com.polaropposite.mochaui.build;
 
 import net.contentobjects.jnotify.JNotifyListener;
 

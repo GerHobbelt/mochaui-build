@@ -1,4 +1,4 @@
-package com.polaropposite.mochaui.buid;
+package com.polaropposite.mochaui.build;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
@@ -41,7 +41,7 @@ public class BuildMochaUI {
                             System.out.printf("\n   [delete] deleted file %s", jsname);
                         }
                     } catch (Exception e) {
-                        System.out.printf("\n    [Error] failed to delete file %s", jsname);
+                        System.err.printf("\n    [Error] failed to delete file %s", jsname);
                     }
                 }
             }
@@ -116,14 +116,14 @@ public class BuildMochaUI {
                 new File(to).setLastModified(new File(from).lastModified());
             }
             catch (Exception e) {
-                System.out.printf("\n    [Error] failed to copy file %s", to);
+                System.err.printf("\n    [Error] failed to copy file %s", to);
             }
             finally {
                 try {
                     if (fis != null) fis.close();
                     if (fos != null) fos.close();
                 } catch(Exception e) {
-                    System.out.printf("\n    [Error] failed to copy file %s", to);                    
+                    System.err.printf("\n    [Error] failed to copy file %s", to);
                 }
             }
         }
@@ -171,6 +171,7 @@ public class BuildMochaUI {
         if (!dir.exists()) {
             if (dir.mkdir())
                 System.out.printf("\n    [mkdir] %s", name);
+
         }
     }
 
@@ -215,6 +216,7 @@ public class BuildMochaUI {
             System.out.printf("\n [compress] compressed %s to %s",from,to);
         } catch(Exception e) {
             System.err.printf("\n    [ERROR] failed to compress %s", to);
+            
         }
     }
 
@@ -229,9 +231,9 @@ public class BuildMochaUI {
             Writer out = new OutputStreamWriter(new FileOutputStream(to), "UTF-8");
             compressor.compress(out, -1);
 
-            System.err.printf("\n[Compress] compressed %s to %s",from,to);
+            System.out.printf("\n [compress] compressed %s to %s",from,to);
         } catch(Exception e) {
-            System.err.printf("\n  [ERROR] failed to compress %s", to);
+            System.err.printf("\n    [ERROR] failed to compress %s", to);
         }
     }
     
@@ -244,7 +246,7 @@ public class BuildMochaUI {
     private void copyResources(String from, String to, String fileType, boolean clear, boolean compress, String[] exclude) {
         // determine source and destination base paths
         String s = File.separator;
-        to += s;
+        if(!to.endsWith(s)) to += s;
         File dir = new File(to);
 
         // make sure base destination path exists
@@ -272,50 +274,53 @@ public class BuildMochaUI {
                                 System.out.printf("   [delete] Deleted %s\n", files[i]);
                         }
                     }
-                } else {
-                    copyResources(from + s + files[i], to + s + files[i], fileType, clear, compress, exclude);
                 }
             }
         }
 
         dir = new File(from);
         String[] files = dir.list();
-        int size = files.length;
-        for (int i = 0; i < size; i++) {
-            File file = new File(dir.toString() + s + files[i]);
-            String fromFile = from + s + files[i];
-            String toFile = to + fromFile.replace(from + s, "");
-            File file2 = new File(toFile);
+        if(files!=null) {
+            int size = files.length;
+            for (int i = 0; i < size; i++) {
+                File file = new File(dir.toString() + s + files[i]);
+                String fromFile = from + s + files[i];
+                String toFile = to + fromFile.replace(from + s, "");
+                File file2 = new File(toFile);
 
-            // if it is a file
-            if (file.isFile()) {
-                // make sure path exists
-                String toPath = toFile.replace(file2.getName(), "");
-                mkdir(toPath);
+                // if it is a file
+                if (file.isFile()) {
+                    // make sure path exists
+                    String toPath = toFile.replace(file2.getName(), "");
+                    mkdir(toPath);
 
-                // if target does not exist or is older then copy/compress
-                if ((!file2.exists() || file2.lastModified() < file.lastModified()) && fromFile.indexOf('.') > 0 || forceCopy) {
+                    // if target does not exist or is older then copy/compress
+                    if ((!file2.exists() || file2.lastModified() < file.lastModified()) && fromFile.indexOf('.') > 0 || forceCopy) {
 
-                    // if it is not already compressed
-                    if (toFile.indexOf(".min.") < 0 && toFile.indexOf("-yc.") < 0 && fromFile.endsWith("." + fileType) && compress) {
-                        // need to compress the files
-                        if (fileType.equals("css"))
-                            compressCssFile(fromFile, toFile);
-                        else
-                            compressCssFile(fromFile, toFile);
-                    } else {
-                        if (fromFile.endsWith(".html")) {
-                            copyHTML(fromFile, toFile);
+                        // if it is not already compressed
+                        if (toFile.indexOf(".min.") < 0 && toFile.indexOf("-yc.") < 0 && fromFile.endsWith("." + fileType) && compress) {
+                            // need to compress the files
+                            if (fileType.equals("css"))
+                                compressCssFile(fromFile, toFile);
+                            else
+                                compressJsFile(fromFile, toFile);
                         } else {
-                            // copy the file
-                            copyFile(fromFile, toFile);
+                            if (fromFile.endsWith(".html")) {
+                                copyHTML(fromFile, toFile);
+                            } else {
+                                // copy the file
+                                copyFile(fromFile, toFile);
+                            }
                         }
                     }
+                } else {
+                    // if it is a directory make it
+                    copyResources(from + s + files[i], to + files[i], fileType, clear, compress, exclude);
+                    mkdir(toFile);
                 }
-            } else {
-                // if it is a directory make it
-                mkdir(toFile);
             }
+        } else {            
+            System.err.printf("\n  [WARNING] directory %s is empty", from);
         }
     }
 
@@ -419,7 +424,7 @@ public class BuildMochaUI {
             size = mootoolsScripts.length;
             for (int i = 0; i < size; i++) {
                 String text = readFile(dir1 + mootoolsScripts[i]);
-                System.out.printf("\n    [appending] %s", dest.getCanonicalPath());
+                System.out.printf("\n[appending] %s", dest.getCanonicalPath());
                 out.append(text);
             }
             out.close();

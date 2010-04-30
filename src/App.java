@@ -1,7 +1,6 @@
-import com.polaropposite.mochaui.buid.BuildMochaUI;
+import com.polaropposite.mochaui.build.BuildMochaUI;
 
 import java.io.File;
-import java.io.IOException;
 
 public class App {
     public static void main(String[] args)
