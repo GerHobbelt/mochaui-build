@@ -21,8 +21,7 @@ public class BuildMochaUI {
             "Window/Modal.js",
             "Components/Tabs.js",
             "Layout/Layout.js",
-            "Layout/Dock.js",
-            "Layout/Workspaces.js"
+            "Layout/Dock.js"
     };
     private boolean forceCopy = false;
 
@@ -231,7 +230,7 @@ public class BuildMochaUI {
             Writer out = new OutputStreamWriter(new FileOutputStream(to), "UTF-8");
             compressor.compress(out, -1);
 
-            System.out.printf("\n [compress] compressed %s to %s",from,to);
+            System.out.printf("\n [compress] compressed %s", to);
         } catch(Exception e) {
             System.err.printf("\n    [ERROR] failed to compress %s", to);
         }
