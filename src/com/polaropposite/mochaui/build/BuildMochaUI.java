@@ -456,7 +456,7 @@ public class BuildMochaUI {
             if(path==null || path.isEmpty()) path = ".";
 
             // initialize file change notifications
-            String fullPath = new File(path).getCanonicalPath();
+            String fullPath = new File(path+"src/").getCanonicalPath();
             int mask =  JNotify.FILE_CREATED  |
                         JNotify.FILE_DELETED  |
                         JNotify.FILE_MODIFIED |
