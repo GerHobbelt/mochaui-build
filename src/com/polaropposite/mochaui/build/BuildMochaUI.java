@@ -112,7 +112,6 @@ public class BuildMochaUI {
                 while ((i = fis.read(buf)) != -1) {
                     fos.write(buf, 0, i);
                 }
-                new File(to).setLastModified(new File(from).lastModified());
             }
             catch (Exception e) {
                 System.err.printf("\n    [Error] failed to copy file %s", to);
@@ -121,6 +120,7 @@ public class BuildMochaUI {
                 try {
                     if (fis != null) fis.close();
                     if (fos != null) fos.close();
+                    new File(to).setLastModified(new File(from).lastModified());
                 } catch(Exception e) {
                     System.err.printf("\n    [Error] failed to copy file %s", to);
                 }
@@ -211,7 +211,8 @@ public class BuildMochaUI {
 
             Writer out = new OutputStreamWriter(new FileOutputStream(to), "UTF-8");
             compressor.compress(out, -1, false, false, false, false);            
-
+            out.close();
+            
             System.out.printf("\n [compress] compressed %s to %s",from,to);
         } catch(Exception e) {
             System.err.printf("\n    [ERROR] failed to compress %s", to);
