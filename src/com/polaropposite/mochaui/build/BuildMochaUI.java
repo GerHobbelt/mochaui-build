@@ -130,7 +130,7 @@ public class BuildMochaUI {
 
     private void copyHTML(String from,String to) {
         System.out.printf("\n     [copy] Copying 1 file to %s",to);
-        String src=readFile(from);
+        String src=readFile(from).replaceAll("\\.\\./themes","themes").replaceAll("\\.\\./plugins","plugins");
 
         String tag="<!--MOCHAUI-->";
         if(src.indexOf(tag)>-1) {
@@ -381,7 +381,7 @@ public class BuildMochaUI {
         //------------------------------------------------------
         // build script libraries
         String licenseFile = new File(mochaPath+"MIT-LICENSE.txt").getCanonicalPath();
-        String authorsFile = new File(mochaPath+"Authors.txt").getCanonicalPath();
+        String authorsFile = new File(mochaPath+"AUTHORS.txt").getCanonicalPath();
 
         // make sure license files are in the same folder as mocha.js in demo
         copyFile(licenseFile, mochaPath+"demo/scripts/MIT-LICENSE.txt");
