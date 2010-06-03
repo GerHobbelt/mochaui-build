@@ -406,7 +406,7 @@ public class BuildMochaUI {
             }
         }
 
-        if (!dest.exists() || dest.lastModified() < mootoolsScriptsMod) {
+        if (!dest.exists() || dest.lastModified() < mootoolsScriptsMod || force) {
             // clear the demo mocha.js
             System.out.printf("\n [building] %s", dest.getCanonicalPath());
             if (dest.exists()) dest.delete();
@@ -423,8 +423,8 @@ public class BuildMochaUI {
             // create the demo mocha.js that is not compressed
             size = mootoolsScripts.length;
             for (int i = 0; i < size; i++) {
-                String text = readFile(dir1 + mootoolsScripts[i]);
-                System.out.printf("\n[appending] %s", dest.getCanonicalPath());
+                String text = readFile(dir1 + mootoolsScripts[i]).replaceAll("\\.\\./themes","themes").replaceAll("\\.\\./plugins","plugins");
+                System.out.printf("\n[appending] %s", dir1 + mootoolsScripts[i]);
                 out.append(text);
             }
             out.close();
