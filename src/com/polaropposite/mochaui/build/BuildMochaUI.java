@@ -16,12 +16,15 @@ public class BuildMochaUI {
     private long mootoolsMoreMod = 0;
     private long mootoolsScriptsMod = 0;
     private String[] mootoolsScripts = {
-            "Core/Core.js",
-            "Window/Window.js",
-            "Window/Modal.js",
-            "Components/Tabs.js",
-            "Layout/Layout.js",
-            "Layout/Dock.js"
+            "core.js",
+		    "update.js",
+            "window.js",
+            "modal.js",
+            "desktop.js",
+		    "column.js",
+		    "panel.js",
+            "dock.js",
+		    "themes.js"
     };
     private boolean forceCopy = false;
 
