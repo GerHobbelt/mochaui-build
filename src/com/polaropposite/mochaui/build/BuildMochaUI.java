@@ -2,8 +2,6 @@ package com.polaropposite.mochaui.build;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
-import net.contentobjects.jnotify.JNotify;
-import net.contentobjects.jnotify.JNotifyException;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 
@@ -449,34 +447,6 @@ public class BuildMochaUI {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static int Watch(String path, boolean force) {
-        try {
-            if(path==null || path.isEmpty()) path = ".";
-
-            // initialize file change notifications
-            String fullPath = new File(path).getCanonicalPath();
-            int mask =  JNotify.FILE_CREATED  |
-                        JNotify.FILE_DELETED  |
-                        JNotify.FILE_MODIFIED |
-                        JNotify.FILE_RENAMED;
-
-            return JNotify.addWatch(fullPath, mask, true, new FileChangeWatcher(path,force));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
-    public static boolean StopWatch(int watchId) {
-        try {
-            JNotify.removeWatch(watchId);
-            return true;
-        } catch (JNotifyException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 }
 
